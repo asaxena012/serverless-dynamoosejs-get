@@ -36,4 +36,4 @@ functions:
             description: "Get users based on joining date" 
 
 custom:
-  stage: ${opt:stage, self:provider.stage
+  stage: ${opt:stage, self:provider.stage}
