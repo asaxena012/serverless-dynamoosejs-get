@@ -4,6 +4,59 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: ap-south-1
+  environment:
+    USERS_TABLE_NAME:
+      Ref: UsersTable
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            # - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            # - dynamodb:UpdateItem
+            # - dynamodb:DeleteItem
+          Resource: 
+            - "Fn::GetAtt": [UsersTable, Arn]
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.usersTable}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+          - AttributeName: dateJoined
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: DateJoinedIndex
+            KeySchema:
+              - AttributeName: dateJoined
+                KeyType: HASH
+            Projection:
+              ProjectionType: 'ALL'
+        BillingMode: PAY_PER_REQUEST
+
+iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:DescribeTable
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DeleteItem
+    Resource:
+      - "Fn::GetAtt": [myTable, Arn]
 
 functions:
   fetchUserDetails:
@@ -24,3 +77,4 @@ functions:
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  usersTable: ${self:custom.stage}-usersTable
