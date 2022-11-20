@@ -1,9 +1,14 @@
 'use strict';
+const dynamoose = require("dynamoose");
 
 module.exports.lambda_handler = async (event) => {
 
   console.log("Welcome to serverless-dynamoosejs lambda function!")
   console.log("API Event :: ", event)
+  console.log("DynamoDB Table Name :: ", process.env.USERS_TABLE_NAME)
+  console.log("DynamoDB Table Name :: ", process.env.USERS_TABLE_NAME) // Remove
+  console.log("DynamoDB Table Name :: ", process.env.USERS_TABLE_NAME) // Remove
+  console.log("DynamoDB Table Name :: ", process.env.USERS_TABLE_NAME) // Remove
 
   return {
     statusCode: 200,
