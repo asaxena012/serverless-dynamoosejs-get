@@ -22,6 +22,13 @@ provider:
           Resource: 
             - "Fn::GetAtt": [UsersTable, Arn]
 
+layers:
+  dynamoose:
+    path: layers
+    description: dynamoose dependency layer for nodejs
+    compatibleRuntimes:
+      - nodejs8.10
+
 resources:
   Resources:
     UsersTable:
@@ -45,22 +52,11 @@ resources:
               ProjectionType: 'ALL'
         BillingMode: PAY_PER_REQUEST
 
-iamRoleStatements:
-  - Effect: Allow
-    Action:
-      - dynamodb:DescribeTable
-      - dynamodb:Query
-      - dynamodb:Scan
-      - dynamodb:GetItem
-      - dynamodb:PutItem
-      - dynamodb:UpdateItem
-      - dynamodb:DeleteItem
-    Resource:
-      - "Fn::GetAtt": [myTable, Arn]
-
 functions:
   fetchUserDetails:
     handler: src/app.lambda_handler
+    layers:
+      - !Ref DynamooseLambdaLayer
     events:
       - http:
           path: /service/v1/user/{id}
