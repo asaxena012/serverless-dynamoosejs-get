@@ -2,8 +2,8 @@
 
 module.exports.lambda_handler = async (event) => {
 
-  console.log("Welcome to serverless-dynamoosejs-get lambda function!")
-  console.log("Event :: ", event)
+  console.log("Welcome to serverless-dynamoosejs lambda function!")
+  console.log("API Event :: ", event)
 
   return {
     statusCode: 200,
