@@ -1,5 +1,6 @@
 // const { getUserModel } = require("../db/models/userSchema.js")
 const dynamoose = require("dynamoose");
+const { dateIsValid } = require("../helper");
 
 const userSchema = new dynamoose.Schema({
     "id": {
@@ -95,10 +96,10 @@ const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64E
 }
 
 const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded, dbModel) => {
-    const { joinedData } = queryStringParameters
+    const { joinedDate } = queryStringParameters
 
-    if (!joinedData) {
-        const errString = "User joining date not found path parameters"
+    if (!joinedDate || !dateIsValid(joinedDate)) {
+        const errString = "User joining date string (YYYY-MM-DD) not found in path parameters"
         console.error(errString)
         return {
             statusCode: null, body: null, err: {
@@ -107,6 +108,11 @@ const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded
             }
         }
     }
+
+    const date = new Date(joinedDate);
+
+    const startDateTs = date.getTime();
+    const endDateTs = startDateTs + 86400000;
 
     try {
         // Create and return model 
@@ -128,8 +134,8 @@ const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded
     let results = null
     try {
         // Query using model
-        console.log("Calling get: ", userId)
-        results = await dbModel.get(parseInt(userId)) // will query all items where the hashKey `breed` contains `Terrier`    
+        results = await dbModel.query("dateJoined").between(startDateTs, endDateTs).using("DateJoinedIndex");
+        // results = await dbModel.get(parseInt(userId)) // will query all items where the hashKey `breed` contains `Terrier`    
         const result = { ...results }
         console.log("Result item ::  ", result)
 
