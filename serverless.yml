@@ -55,6 +55,8 @@ resources:
 functions:
   fetchUserDetails:
     handler: src/app.lambda_handler
+    memorySize: 128
+    runtime: nodejs18.x
     layers:
       - !Ref DynamooseLambdaLayer
     events:
