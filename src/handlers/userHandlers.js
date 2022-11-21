@@ -59,25 +59,25 @@ const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64E
     } catch (error) {
         const errString = `Unable to create dynamoDB user model:: ${JSON.stringify(error)}`
         console.error(errString)
-        return {
+        return ({
             statusCode: null, body: null, err: {
                 statusCode: 500,
                 message: errString
             }
-        }
+        }, null)
     }
 
     let results = null
     try {
         // Query using model
         console.log("Calling get: ", userId)
-        results = await dbModel.get(userId) // will query all items where the hashKey `breed` contains `Terrier`    
-        console.log("Total items found :: ", results.len)
-        console.log("Result item ::  ", results[0])
+        results = await dbModel.get(parseInt(userId)) // will query all items where the hashKey `breed` contains `Terrier`    
+        const result = { ...results }
+        console.log("Result item ::  ", result)
 
         return {
             statusCode: 200,
-            body: results[0],
+            body: result,
             err: null
         }
     } catch (error) {
@@ -91,14 +91,65 @@ const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64E
         }
     }
 
-
-    // If found return
-
     // Else return null
 }
 
-const fetchUsers = (queryStringParameters, pathParameters, isBase64Encoded) => {
-    // TODO :: Extract querys params
+const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded, dbModel) => {
+    const { joinedData } = queryStringParameters
+
+    if (!joinedData) {
+        const errString = "User joining date not found path parameters"
+        console.error(errString)
+        return {
+            statusCode: null, body: null, err: {
+                statusCode: 400,
+                message: errString
+            }
+        }
+    }
+
+    try {
+        // Create and return model 
+        if (!dbModel) {
+            console.log("model: ", userId)
+            dbModel = getUserModel(process.env.USERS_TABLE_NAME)
+        }
+    } catch (error) {
+        const errString = `Unable to create dynamoDB user model:: ${JSON.stringify(error)}`
+        console.error(errString)
+        return ({
+            statusCode: null, body: null, err: {
+                statusCode: 500,
+                message: errString
+            }
+        }, null)
+    }
+
+    let results = null
+    try {
+        // Query using model
+        console.log("Calling get: ", userId)
+        results = await dbModel.get(parseInt(userId)) // will query all items where the hashKey `breed` contains `Terrier`    
+        const result = { ...results }
+        console.log("Result item ::  ", result)
+
+        return {
+            statusCode: 200,
+            body: result,
+            err: null
+        }
+    } catch (error) {
+        const errString = `Unable to query dynamoDB user table :: ${JSON.stringify(error)}`
+        console.error(errString)
+        return {
+            statusCode: null, body: null, err: {
+                statusCode: 500,
+                message: errString
+            }
+        }
+    }
+
+    // Else return null
 }
 
 module.exports = {
