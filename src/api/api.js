@@ -1,14 +1,16 @@
-import { fetchUserDetails, fetchUsers } from "../handlers/userHandlers";
+const { fetchUserDetails, fetchUsers } = require("../handlers/userHandlers")
 
-export const APIResources = {
-    FetchUserDetails: {
+const APIResources = {
+    "/service/v1/user/{id}": {
         Resource: "/service/v1/user/{id}",
         Method: "GET",
         Handler: fetchUserDetails
     },
-    FetchUsers: {
+    "/service/v1/user": {
         Resource: "/service/v1/user",
         Method: "GET",
         Handler: fetchUsers
     }
 }
+
+module.exports = { APIResources }

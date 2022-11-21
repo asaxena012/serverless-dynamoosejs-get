@@ -1,7 +1,11 @@
 const dynamoose = require("dynamoose");
 
 const userSchema = new dynamoose.Schema({
-    "id": Number,
+    "id": {
+        type: Number,
+        hashKey: true,
+        required: true,
+    },
     "firstName": String,
     "lastName": String,
     "email": String,
@@ -10,7 +14,15 @@ const userSchema = new dynamoose.Schema({
         "enum": ['Female', 'Genderfluid', 'Male', 'Polygender', 'Bigender', 'Agender', 'Non-binary', 'Genderqueer']
     },
     "ipAddress": String,
-    "dateJoined": Number,
+    "dateJoined": {
+        type: Number,
+        required: true,
+        index: {
+            name: "DateJoinedIndex",
+            global: true
+        },
+    }
+
 }, {
     "saveUnknown": false,
     "timestamps": true
