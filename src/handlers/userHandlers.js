@@ -111,13 +111,12 @@ const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded
 
     const date = new Date(joinedDate);
 
-    const startDateTs = date.getTime();
-    const endDateTs = startDateTs + 86400000;
+    const startDateTs = date.getTime() / 1000;
+    const endDateTs = startDateTs + 86400;
 
     try {
         // Create and return model 
         if (!dbModel) {
-            console.log("model: ", userId)
             dbModel = getUserModel(process.env.USERS_TABLE_NAME)
         }
     } catch (error) {
@@ -134,10 +133,12 @@ const fetchUsers = async (queryStringParameters, pathParameters, isBase64Encoded
     let results = null
     try {
         // Query using model
-        results = await dbModel.query("dateJoined").between(startDateTs, endDateTs).using("DateJoinedIndex");
+        console.log("StartDate:: ", typeof startDateTs)
+        console.log("EndDate:: ", typeof endDateTs)
+        results = await dbModel.query("dateJoined").between(startDateTs, endDateTs).using("DateJoinedIndex").exec();
         // results = await dbModel.get(parseInt(userId)) // will query all items where the hashKey `breed` contains `Terrier`    
         const result = { ...results }
-        console.log("Result item ::  ", result)
+        console.log("Result item ::  ", results)
 
         return {
             statusCode: 200,
