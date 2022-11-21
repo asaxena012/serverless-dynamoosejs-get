@@ -3,7 +3,8 @@ const dynamoose = require("dynamoose");
 const { APIResources } = require("./api/api");
 let dbModel = null
 
-module.exports.lambda_handler = async (event) => {
+module.exports.lambda_handler = async (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = true;
 
   console.log("Welcome to serverless-dynamoosejs lambda function!")
   console.log("API Event :: ", event)
@@ -16,7 +17,7 @@ module.exports.lambda_handler = async (event) => {
   const { statusCode, body, err } = apiHandler(queryStringParameters, pathParameters, isBase64Encoded, dbModel)
 
   if (err) {
-    return {
+    callback({
       statusCode: err.statusCode,
       body: JSON.stringify(
         {
@@ -25,16 +26,18 @@ module.exports.lambda_handler = async (event) => {
         null,
         2
       ),
-    };
+    }, null)
+    return;
   }
-  return {
+  callback(null, {
     statusCode: statusCode,
     body: JSON.stringify(
       body,
       null,
       2
     ),
-  };
+  })
+  return;
 };
 
 const getAPIHandler = (apiEvent) => {

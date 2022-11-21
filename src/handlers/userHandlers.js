@@ -1,4 +1,40 @@
-const { getUserModel } = require("../db/models/userSchema")
+// const { getUserModel } = require("../db/models/userSchema.js")
+const dynamoose = require("dynamoose");
+
+const userSchema = new dynamoose.Schema({
+    "id": {
+        type: Number,
+        hashKey: true,
+        required: true,
+    },
+    "firstName": String,
+    "lastName": String,
+    "email": String,
+    "gender": {
+        "type": String,
+        "enum": ['Female', 'Genderfluid', 'Male', 'Polygender', 'Bigender', 'Agender', 'Non-binary', 'Genderqueer']
+    },
+    "ipAddress": String,
+    "dateJoined": {
+        type: Number,
+        required: true,
+        index: {
+            name: "DateJoinedIndex",
+            global: true
+        },
+    }
+
+}, {
+    "saveUnknown": false,
+    "timestamps": true
+});
+
+const getUserModel = (tableName) => {
+    return dynamoose.model(tableName, userSchema, {
+        "create": false,
+        "waitForActive": false
+    });
+}
 
 const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64Encoded, dbModel) => {
     const { id: userId } = pathParameters
@@ -17,6 +53,7 @@ const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64E
     try {
         // Create and return model 
         if (!dbModel) {
+            console.log("model: ", userId)
             dbModel = getUserModel(process.env.USERS_TABLE_NAME)
         }
     } catch (error) {
@@ -33,7 +70,8 @@ const fetchUserDetails = async (queryStringParameters, pathParameters, isBase64E
     let results = null
     try {
         // Query using model
-        results = await dbModel.query("id").contains(userId).exec() // will query all items where the hashKey `breed` contains `Terrier`    
+        console.log("Calling get: ", userId)
+        results = await dbModel.get(userId) // will query all items where the hashKey `breed` contains `Terrier`    
         console.log("Total items found :: ", results.len)
         console.log("Result item ::  ", results[0])
 
