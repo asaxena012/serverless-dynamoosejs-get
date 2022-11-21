@@ -20,8 +20,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: populate dynamoDB table
-      run: npm i dynamoose
-      run: node dynamo-populate/index.js
+      run: |
+        npm i dynamoose
+        node dynamo-populate/index.js
       env:
         # SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         # or if using AWS credentials directly
