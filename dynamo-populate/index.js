@@ -38,11 +38,8 @@ const User = dynamoose.model("staging-usersTable", userSchema, {
 //     });
 // })()
 
-const updatedData = data.map(userData => {
-    return { ...userData, joinedDate: new Date(new Date(userData.joinedDate).toLocaleDateString()).getTime() }
-})
+const updatedData = data.map((userData) => ({ ...userData, joinedDate: new Date(new Date(userData.joinedDate).toLocaleDateString).getTime() / 1000 }))
 
-    // Update table
     (async () => {
         await User.batchPut(updatedData, (error) => {
             if (error) {
