@@ -14,14 +14,15 @@ provider:
           Action:
             - dynamodb:DescribeTable
             - dynamodb:Query
-            # - dynamodb:Scan
             - dynamodb:GetItem
             - dynamodb:PutItem
-            # - dynamodb:UpdateItem
-            # - dynamodb:DeleteItem
-          Resource: 
-            - "Fn::GetAtt": [UsersTable, Arn]
-
+          Resource:        
+            - { "Fn::GetAtt": ["UsersTable", "Arn" ] }
+            - Fn::Join:
+              - "/"
+              -
+                - { "Fn::GetAtt": ["UsersTable", "Arn" ] }
+                - "index/*"
 layers:
   dynamoose:
     path: layers

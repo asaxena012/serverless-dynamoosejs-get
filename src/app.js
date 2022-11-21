@@ -1,7 +1,5 @@
 'use strict';
-const dynamoose = require("dynamoose");
 const { APIResources } = require("./api/api");
-const { fetchUserDetails } = require("./handlers/userHandlers.js")
 let dbModel = null
 
 module.exports.lambda_handler = async (event, context, callback) => {
@@ -17,8 +15,8 @@ module.exports.lambda_handler = async (event, context, callback) => {
 
   const { statusCode, body, err } = await apiHandler(queryStringParameters, pathParameters, isBase64Encoded, dbModel, callback)
 
-  if (err) {
-    callback({
+  if (err != null) {
+    callback(null, {
       statusCode: err.statusCode,
       body: JSON.stringify(
         {
@@ -27,7 +25,7 @@ module.exports.lambda_handler = async (event, context, callback) => {
         null,
         2
       ),
-    }, null)
+    })
     return;
   }
 
