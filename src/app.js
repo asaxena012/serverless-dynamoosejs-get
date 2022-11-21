@@ -1,5 +1,7 @@
 'use strict';
 const dynamoose = require("dynamoose");
+const { APIResources } = require("./api/api");
+let dbModel = null
 
 module.exports.lambda_handler = async (event) => {
 
@@ -7,18 +9,34 @@ module.exports.lambda_handler = async (event) => {
   console.log("API Event :: ", event)
   console.log("DynamoDB Table Name :: ", process.env.USERS_TABLE_NAME)
 
+  const { queryStringParameters, pathParameters, isBase64Encoded } = event
+
+  const apiHandler = getAPIHandler(event)
+
+  const { statusCode, body, err } = apiHandler(queryStringParameters, pathParameters, isBase64Encoded, dbModel)
+
+  if (err) {
+    return {
+      statusCode: err.statusCode,
+      body: JSON.stringify(
+        {
+          message: err.message,
+        },
+        null,
+        2
+      ),
+    };
+  }
   return {
-    statusCode: 200,
+    statusCode: statusCode,
     body: JSON.stringify(
-      {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
+      body,
       null,
       2
     ),
   };
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };
+
+const getAPIHandler = (apiEvent) => {
+  return APIResources[apiEvent.resource]?.Handler
+}
