@@ -1,0 +1,30 @@
+name: Populate DynamoDB Table
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i dynamoose
+    - run: node ../../dynamo-populate/index.js
+    # - name: populate dynamoDB table
+    #   env:
+    #     # SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+    #     # or if using AWS credentials directly
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_UAT }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_UAT }}
+    #     AWS_REGION: ap-south-1
