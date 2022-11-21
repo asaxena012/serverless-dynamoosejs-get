@@ -3,7 +3,7 @@ name: Populate DynamoDB Table
 on:
   push:
     branches:
-      - staging
+      - table-populate
 
 jobs:
   deploy:
